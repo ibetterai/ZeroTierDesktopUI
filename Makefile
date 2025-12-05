@@ -40,6 +40,12 @@ libui_windows_32:	FORCE
 	cd libui-ng && "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat" && ninja -C build -j 12
 	cd libui-ng\build\meson-out && rename libui.a ui.lib
 
+libui_windows_arm64:	FORCE
+	-rmdir /Q /S libui-ng\build-arm64
+	cd libui-ng && "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsx86_arm64.bat" && meson setup build-arm64 --cross-file=../arm64-windows.txt --buildtype=release -Db_vscrt=mt --default-library=static --backend=ninja
+	cd libui-ng && "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsx86_arm64.bat" && ninja -C build-arm64 -j 12
+	cd libui-ng\build-arm64\meson-out && rename libui.a ui.lib
+
 windows_64:	FORCE
 	make libui_windows_64
 	make -C tray clean
@@ -52,7 +58,13 @@ windows_32: FORCE
 	make -C tray zt_lib WIN_32BIT=1
 	set "RUSTFLAGS=-C link-args=/SAFESEH:NO -C target-feature=+crt-static" && cargo build $(CARGO_FLAGS) --target=i686-pc-windows-msvc
 
-windows: windows_32 windows_64
+windows_arm64:	FORCE
+	make libui_windows_arm64
+	make -C tray clean
+	make -C tray zt_lib WIN_ARM64=1
+	set "RUSTFLAGS=-C target-feature=+crt-static" && cargo build $(CARGO_FLAGS) --target=aarch64-pc-windows-msvc
+
+windows: windows_32 windows_64 windows_arm64
 
 linux: libui
 	cd tray ; make clean
@@ -85,11 +97,12 @@ clean: FORCE
 	-make -C tray clean
 	-rmdir /Q /S target
 	-rmdir /Q /S libui-ng\build
+	-rmdir /Q /S libui-ng\build-arm64
 else
 clean: FORCE
 	rm -f tray/*.o tray/*.a tray/example tray/example.exe
 	rm -rf ZeroTier.app target
-	rm -rf libui-ng/build
+	rm -rf libui-ng/build libui-ng/build-arm64
 endif
 
 distclean:	clean

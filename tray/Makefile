@@ -8,9 +8,13 @@ ifeq ($(OS),Windows_NT)
 	else
 		OPT_FLAGS := -Og
 	endif
-	ifeq ($(WIN_32BIT),1)
+	ifeq ($(WIN_ARM64),1)
+		# ARM64: vcvars environment sets target architecture, no -m flag needed
+		TRAY_CFLAGS := $(OPT_FLAGS) -DTRAY_WINAPI=1 -std=c99 -fno-exceptions -static
+	else ifeq ($(WIN_32BIT),1)
 		TRAY_CFLAGS := $(OPT_FLAGS) -DTRAY_WINAPI=1 -std=c99 -m32 -fno-exceptions -static
 	else
+		# Default x64
 		TRAY_CFLAGS := $(OPT_FLAGS) -DTRAY_WINAPI=1 -std=c99 -m64 -fno-exceptions -static
 	endif
 else ifeq ($(shell uname -s),Linux)
