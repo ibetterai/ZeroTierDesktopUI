@@ -1,0 +1,38 @@
+# Meson Cross-Compilation File for Windows ARM64
+#
+# This file configures Meson to cross-compile from x64 Windows hosts to ARM64 Windows targets.
+# It specifies the MSVC ARM64 compiler toolchain paths and target machine architecture.
+#
+# Usage: meson setup build-arm64 --cross-file=arm64-windows.txt
+#
+# IMPORTANT: Update the MSVC version number (14.44.35207) when Visual Studio updates.
+# The version number appears in the compiler paths below and must match your installed MSVC version.
+#
+# To find your installed MSVC version, run:
+#   dir "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\"
+#
+# Prerequisites:
+# - Visual Studio 2022 with "ARM64/ARM64EC build tools" component installed
+# - Windows 11 SDK (10.0.22621.0 or later)
+# - vcvarsx86_arm64.bat environment active before running Meson
+
+[binaries]
+# ARM64 C compiler (native ARM64 build)
+c = ['C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostarm64\arm64\cl.exe']
+
+# ARM64 C++ compiler (native ARM64 build)
+cpp = ['C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostarm64\arm64\cl.exe']
+
+# ARM64 static library archiver
+ar = ['C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostarm64\arm64\lib.exe']
+
+[host_machine]
+# Target system configuration
+system = 'windows'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[built-in options]
+# Static CRT linking (matches existing Windows build configuration)
+b_vscrt = 'mt'
